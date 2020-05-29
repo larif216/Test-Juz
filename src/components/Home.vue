@@ -21,7 +21,7 @@
     </div>
 
     <div v-if="!isValid">
-        <h6>Juz Number is invalid.</h6>
+      <h6>Juz Number is invalid.</h6>
     </div>
 
     <div class="content" v-if="juz !== null & isValid">
@@ -31,14 +31,22 @@
         </div>
         <div class="card-body">
           <p class="card-text">{{ renderArText(juz.ayahs[currentAyah].text) }}</p>
+          <p
+            v-if="showInfo" class="card-text info"
+          >QS. {{ juz.ayahs[currentAyah].surah }} : {{ juz.ayahs[currentAyah].number }}</p>
         </div>
       </div>
       <div class="navigation">
         <div class="row">
-          <div class="col">
+          <div class="col-md-5 col-5">
             <button type="button" class="btn btn-dark btn-md" @click="getPrevAyah">Previous Ayah</button>
           </div>
-          <div class="col">
+          <div id="mid" class="col-md-2 col-2">
+            <button type="button" class="btn btn-dark btn-md" @click="toggleShowInfo">
+              <i id="mid-icon" class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="col-md-5 col-5">
             <button type="button" class="btn btn-dark btn-md" @click="getNextAyah">Next Ayah</button>
           </div>
         </div>
@@ -78,7 +86,8 @@ export default {
       endOfJuz: false,
       show: true,
       isLoading: false,
-      isValid: true
+      isValid: true,
+      showInfo: true
     }
   },
   methods: {
@@ -87,6 +96,12 @@ export default {
         document.getElementById('hide-show').className = 'fas fa-eye-slash'
       } else document.getElementById('hide-show').className = 'fas fa-eye'
       this.show = !this.show
+    },
+    toggleShowInfo () {
+      if (this.showInfo) {
+        document.getElementById('mid-icon').className = 'fas fa-eye-slash'
+      } else document.getElementById('mid-icon').className = 'fas fa-eye'
+      this.showInfo = !this.showInfo
     },
     // async getJuzData () {
     //   this.juz = null
@@ -198,7 +213,7 @@ input {
 }
 
 .next-question {
-  margin-top: 8px;
+  margin-top: 15px;
 }
 
 button {
@@ -281,6 +296,11 @@ button {
   }
 }
 
+.info {
+  font-size: 1rem;
+  font-style: italic;
+}
+
 @media screen and (max-width: 426px) {
   h2 {
     font-size: 1.5rem;
@@ -296,6 +316,14 @@ button {
 
   .card-body {
     font-size: 1.5rem;
+  }
+
+  .info {
+    font-size: 0.9rem;
+  }
+
+  #mid {
+    padding: 0 3px 0 3px;
   }
 }
 </style>
