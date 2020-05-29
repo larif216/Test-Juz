@@ -59,7 +59,8 @@
 </template>
 
 <script>
-import QuranService from '@/services/QuranService'
+// import QuranService from '@/services/QuranService'
+import JuzData from '@/../static/data/JuzData.json'
 
 export default {
   name: 'home',
@@ -81,20 +82,27 @@ export default {
       } else document.getElementById('hide-show').className = 'fas fa-eye'
       this.show = !this.show
     },
-    async getJuzData () {
+    // async getJuzData () {
+    //   this.juz = null
+    //   this.isLoading = true
+    //   await QuranService.getJuz({
+    //     numberOfJuz: this.juzNumber
+    //   })
+    //     .then(response => {
+    //       this.juz = response.data.data
+    //       this.getNextQuestion()
+    //       this.isLoading = false
+    //     })
+    //     .catch(error => {
+    //       console.log(error)
+    //     })
+    // },
+    getJuzData () {
       this.juz = null
       this.isLoading = true
-      await QuranService.getJuz({
-        numberOfJuz: this.juzNumber
-      })
-        .then(response => {
-          this.juz = response.data.data
-          this.getNextQuestion()
-          this.isLoading = false
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.juz = JuzData.data[parseInt(this.juzNumber) - 1]
+      this.isLoading = false
+      this.getNextQuestion()
     },
     renderArText (text) {
       text = this.removeBasmala(text).split(' ')
@@ -105,11 +113,15 @@ export default {
     },
     removeBasmala (text) {
       const ayah = this.juz.ayahs[this.currentAyah]
-      if (ayah.surah.englishName !== 'Al-Faatiha') {
-        return text.replace(
-          '\u0628\u0650\u0633\u0652\u0645\u0650 \u0671\u0644\u0644\u0651\u064e\u0647\u0650 \u0671\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0670\u0646\u0650 \u0671\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650',
-          ''
-        )
+      //   if (ayah.surah.englishName !== 'Al-Faatiha') {
+      //     return text.replace(
+      //       '\u0628\u0650\u0633\u0652\u0645\u0650 \u0671\u0644\u0644\u0651\u064e\u0647\u0650 \u0671\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0670\u0646\u0650 \u0671\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650',
+      //       ''
+      //     )
+      //   }
+      //   return text
+      if (ayah.name !== 'Al-Faatiha') {
+        return text.replace(JuzData.data[0].ayahs[0].text, '')
       }
       return text
     },
