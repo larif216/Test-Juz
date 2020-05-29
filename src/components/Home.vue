@@ -12,6 +12,7 @@
             v-model="juzNumber"
             placeholder="ex: 1,2,30 or 28-30"
             required
+            @keydown.enter.prevent="getJuzData"
           />
           <br />
           <button type="button" class="btn btn-dark btn-md" @click.stop.prevent="getJuzData">Start</button>
@@ -19,7 +20,11 @@
       </div>
     </div>
 
-    <div class="content" v-if="juz !== null">
+    <div v-if="!isValid">
+        <h6>Juz Number is invalid.</h6>
+    </div>
+
+    <div class="content" v-if="juz !== null & isValid">
       <div class="card">
         <div class="card-header">
           <strong>Juz {{ juz.number }}</strong>
@@ -72,7 +77,8 @@ export default {
       beginningOfJuz: false,
       endOfJuz: false,
       show: true,
-      isLoading: false
+      isLoading: false,
+      isValid: true
     }
   },
   methods: {
@@ -98,11 +104,18 @@ export default {
     //     })
     // },
     getJuzData () {
-      this.juz = null
-      this.isLoading = true
-      this.juz = JuzData.data[parseInt(this.juzNumber) - 1]
-      this.isLoading = false
-      this.getNextQuestion()
+      if (parseInt(this.juzNumber) <= 0 | parseInt(this.juzNumber) > 30 | this.juzNumber === null | this.juzNumber === '') {
+        this.isValid = false
+      } else {
+        this.isValid = true
+        this.juz = null
+        this.isLoading = true
+        this.juz = JuzData.data[parseInt(this.juzNumber) - 1]
+        this.isLoading = false
+        this.getNextQuestion()
+        if (this.currentAyah === 1) this.beginningOfJuz = true
+        else if (this.currentAyah === this.juz.ayahs.length - 1) this.endOfJuz = true
+      }
     },
     renderArText (text) {
       text = this.removeBasmala(text).split(' ')
