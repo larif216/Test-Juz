@@ -2,6 +2,6 @@ import axios from 'axios'
 
 export default () => {
   return axios.create({
-    baseURL: 'http://api.alquran.cloud/v1/'
+    baseURL: 'https://api.alquran.cloud/v1/'
   })
 }
