@@ -1,72 +1,106 @@
 <template>
-  <div class="container">
-    <div class="input-section">
-      <i @click="toggleHideShow" id="hide-show" class="fas fa-eye"></i>
-      <div v-if="show">
-        <h2>Enter the number of juz that you want to simulate.</h2>
-        <p id="note">Use comma (",") or dash ("-") for multiple juz number</p>
-        <form>
-          <input
-            type="text"
-            name="juzNumber"
-            v-model="juzNumber"
-            placeholder="ex: 1,2,30 or 28-30"
-            required
-            @keydown.enter.prevent="getJuzData"
-          />
-          <br />
-          <button type="button" class="btn btn-dark btn-md" @click.stop.prevent="getJuzData">Start</button>
-        </form>
+  <div>
+    <div class="container top-element">
+      <div class="input-section">
+        <i @click="toggleHideShow" id="hide-show" class="fas fa-eye"></i>
+        <div v-if="show">
+          <h2>Enter the number of juz that you want to simulate.</h2>
+          <p id="note">Use comma (",") or dash ("-") for multiple juz number</p>
+          <form>
+            <input
+              type="text"
+              name="juzNumber"
+              v-model="juzNumber"
+              placeholder="ex: 1,2,30 or 28-30"
+              required
+              @keydown.enter.prevent="getJuzData"
+            />
+            <br />
+            <button type="button" class="btn btn-dark btn-md" @click.stop.prevent="getJuzData">Start</button>
+          </form>
+        </div>
       </div>
-    </div>
 
-    <div v-if="!isValid">
-      <h6>Juz Number is invalid.</h6>
-    </div>
-
-    <div class="content" v-if="juz !== null & isValid">
-      <div class="card">
-        <div class="card-header">
-          <strong>Juz {{ juz.number }}</strong>
+      <transition name="fade">
+        <div v-if="!isValid">
+          <h6>Juz Number is invalid.</h6>
         </div>
-        <div class="card-body">
-          <p class="card-text">{{ renderArText(juz.ayahs[currentAyah].text) }}</p>
-          <p
-            v-if="showInfo" class="card-text info"
-          >QS. {{ juz.ayahs[currentAyah].surah }} : {{ juz.ayahs[currentAyah].number }}</p>
+        <div class="content" v-if="juz !== null & isValid">
+          <div class="card">
+            <div class="card-header">
+              <strong>Juz {{ juz.number }}</strong>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ renderArText(juz.ayahs[currentAyah].text) }}</p>
+              <p
+                v-if="showInfo"
+                class="card-text info"
+              >Juz {{ juz.number }} QS. {{ juz.ayahs[currentAyah].surah }} : {{ juz.ayahs[currentAyah].number }}</p>
+            </div>
+          </div>
+        </div>
+      </transition>
+      <div v-if="isLoading" class="semipolar-spinner">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+      </div>
+      <div
+        class="modal fade"
+        id="nextQuestion"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="nextQuestionLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body">
+              <p>Next Question?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+              <button
+                type="button"
+                class="btn btn-dark"
+                @click="getNextQuestion"
+                data-dismiss="modal"
+              >Yes</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="navigation">
-        <div class="row">
-          <div class="col-md-5 col-5">
-            <button type="button" class="btn btn-dark btn-md" @click="getPrevAyah">Previous Ayah</button>
+    </div>
+    <div class="footer">
+      <div class="container">
+        <div class="navigation">
+          <div class="row">
+            <div id="left" class="col-md-5 col-5">
+              <button type="button" class="btn btn-dark btn-md" @click="getPrevAyah">Previous Ayah</button>
+            </div>
+            <div id="mid" class="col-md-2 col-2">
+              <button type="button" class="btn btn-dark btn-md" @click="toggleShowInfo">
+                <i id="mid-icon" class="fas fa-eye-slash"></i>
+              </button>
+            </div>
+            <div id="right" class="col-md-5 col-5">
+              <button type="button" class="btn btn-dark btn-md" @click="getNextAyah">Next Ayah</button>
+            </div>
           </div>
-          <div id="mid" class="col-md-2 col-2">
-            <button type="button" class="btn btn-dark btn-md" @click="toggleShowInfo">
-              <i id="mid-icon" class="fas fa-eye"></i>
-            </button>
-          </div>
-          <div class="col-md-5 col-5">
-            <button type="button" class="btn btn-dark btn-md" @click="getNextAyah">Next Ayah</button>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <button
-              type="button"
-              class="next-question btn btn-dark btn-md"
-              @click="getNextQuestion"
-            >Next Question</button>
+          <div class="row">
+            <div class="col">
+              <button
+                type="button"
+                class="next-question btn btn-dark btn-md"
+                data-toggle="modal"
+                data-target="#nextQuestion"
+              >Next Question</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="isLoading" class="semipolar-spinner">
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
     </div>
   </div>
 </template>
@@ -87,7 +121,7 @@ export default {
       show: true,
       isLoading: false,
       isValid: true,
-      showInfo: true
+      showInfo: false
     }
   },
   methods: {
@@ -119,7 +153,12 @@ export default {
     //     })
     // },
     getJuzData () {
-      if (parseInt(this.juzNumber) <= 0 | parseInt(this.juzNumber) > 30 | this.juzNumber === null | this.juzNumber === '') {
+      if (
+        (parseInt(this.juzNumber) <= 0) |
+        (parseInt(this.juzNumber) > 30) |
+        (this.juzNumber === null) |
+        (this.juzNumber === '')
+      ) {
         this.isValid = false
       } else {
         this.isValid = true
@@ -129,8 +168,11 @@ export default {
         this.isLoading = false
         this.getNextQuestion()
         if (this.currentAyah === 1) this.beginningOfJuz = true
-        else if (this.currentAyah === this.juz.ayahs.length - 1) this.endOfJuz = true
+        else if (this.currentAyah === this.juz.ayahs.length - 1) {
+          this.endOfJuz = true
+        }
       }
+      this.toggleHideShow()
     },
     renderArText (text) {
       text = this.removeBasmala(text).split(' ')
@@ -221,7 +263,26 @@ button {
 }
 
 .input-section {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+}
+
+.top-element {
+    padding-top: 48px;
+    overflow-y: scroll;
+    max-height: 100%;
+    padding-bottom: 130px;
+}
+
+.top-element::-webkit-scrollbar {
+  display: none;
+}
+
+.footer {
+  width: 100%;
+  bottom: 0;
+  position: fixed;
+  background-color: white;
+  text-align: center;
 }
 
 .semipolar-spinner,
@@ -290,6 +351,20 @@ button {
   z-index: 1;
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease-out;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.modal p {
+  margin: 0;
+}
+
 @keyframes semipolar-spinner-animation {
   50% {
     transform: rotate(360deg) scale(0.7);
@@ -322,8 +397,16 @@ button {
     font-size: 0.9rem;
   }
 
+  #left {
+      padding-right: 3px;
+  }
+
   #mid {
     padding: 0 3px 0 3px;
+  }
+
+  #right {
+      padding-left: 3px;
   }
 }
 </style>
